@@ -1,0 +1,14 @@
+name: Security
+on: [push,pull_request]
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: pip install bandit pip-audit -r backend/requirements.txt
+      - run: bandit -r backend/app -ll
+      - run: pip-audit -r backend/requirements.txt
+      - uses: aquasecurity/trivy-action@master
+        with: {scan-type: fs, scan-ref: '.', severity: 'CRITICAL,HIGH'}
